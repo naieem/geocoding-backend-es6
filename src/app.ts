@@ -50,16 +50,12 @@ class AppBootStrapper {
             });
     }
     routeSetup = () => {
-        this
-            .app
-            .use('/', new CrudRoute().init());
+        this.app.use('/', new CrudRoute().init());
     }
     bootstrap = () => {
-        this
-            .app
-            .listen(AppConfig.portToConnect, function () {
-                console.log('connected to port '+AppConfig.portToConnect);
-            });
+        this.app.listen(AppConfig.portToConnect, function () {
+            console.log('connected to port ' + AppConfig.portToConnect);
+        });
     }
     configureDatabase = () => {
         new DBconfig();
