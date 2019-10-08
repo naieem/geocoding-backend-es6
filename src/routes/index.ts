@@ -24,7 +24,7 @@ class CrudRoute {
             .get('/allMarker', this.markerController.getAllMarker);
         this
             .router
-            .get('/getLatLongFromAddress', this.markerController.getLatLong);
+            .post('/getLatLongFromAddress', this.markerController.getLatLongFromAddress);
         return this.router;
     }
 }

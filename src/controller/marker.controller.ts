@@ -107,7 +107,7 @@ class CrudController {
                 message: "No address provided"
             });
         } else {
-            return this.getLatLong(address).then((result) => {
+            this.getLatLong(address).then((result) => {
                 res.json(200, {
                     success: true,
                     data: result
