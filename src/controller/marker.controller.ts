@@ -21,7 +21,7 @@ class CrudController {
             return this.getLatLong(address)
                 .then((response) => {
                     new ValidationService(MarkerSchema).validate(response).then((vResult) => {
-                        debugger;
+                        
                         this.saveMarker(vResult).then((saveResult) => {
                             res.json(200, {
                                 status: true,

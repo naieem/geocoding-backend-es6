@@ -15,7 +15,7 @@ class ValidationService {
                     result[key] = response;
                 }
             }
-            debugger;
+            
             resolve(result);
         });
     }
