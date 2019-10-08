@@ -21,7 +21,7 @@ class CrudController {
             return this.getLatLong(address)
                 .then((response) => {
                     new ValidationService(MarkerSchema).validate(response).then((vResult) => {
-                        
+
                         this.saveMarker(vResult).then((saveResult) => {
                             res.json(200, {
                                 status: true,
@@ -160,6 +160,27 @@ class CrudController {
                 });
             }
         });
+    }
+    deleteMarker = (req: any, res: any) => {
+        if(req.body.itemId){
+            return this.markerModel.deleteOne({ _id: req.body.itemId }, (err)=> {
+                if (err){
+                    res.json(200, {
+                        status: false,
+                        errorMessage: err
+                    });
+                }else{
+                    res.json(200, {
+                        status: true
+                    });
+                }
+            });
+        }else{
+            res.json(200, {
+                status: false,
+                errorMessage: "Sorry No itemId Provided"
+            });
+        }
     }
 }
 export default CrudController;

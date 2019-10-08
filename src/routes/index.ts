@@ -25,6 +25,9 @@ class CrudRoute {
         this
             .router
             .post('/getLatLongFromAddress', this.markerController.getLatLongFromAddress);
+        this
+            .router
+            .post('/deleteMarker', this.markerController.deleteMarker);
         return this.router;
     }
 }
