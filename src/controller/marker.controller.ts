@@ -13,49 +13,40 @@ class CrudController {
         this.geocodeUrl = Appconfig.geocodeApi + "?key=" + Appconfig.accessKey + "&address=";
     }
     /**
-     * handle route controller call and then registers user
+     * handle route controller call and inserts new marker into database
      */
     addNewMarker = (req: any, res: any) => {
         var address = req.body.address;
         if (address) {
-            return axios.get(this.geocodeUrl + address)
+            return this.getLatLong(address)
                 .then((response) => {
-                    if (response && response.status === 200 && response.data.results.length) {
-                        new ValidationService(MarkerSchema).validate(response.data.results[0]).then((vResult) => {
-                            debugger;
-                            this.saveMarker(vResult).then((saveResult) => {
-                                res.json(200, {
-                                    success: true,
-                                    message: "saved successfully",
-                                    itemId: saveResult['_id']
-                                });
-                            }).catch((saveError) => {
-                                res.json(200, {
-                                    success: false,
-                                    message: "Error saving data",
-                                    errorMessage: saveError
-
-                                });
+                    new ValidationService(MarkerSchema).validate(response).then((vResult) => {
+                        debugger;
+                        this.saveMarker(vResult).then((saveResult) => {
+                            res.json(200, {
+                                success: true,
+                                message: "saved successfully",
+                                itemId: saveResult['_id']
                             });
-                        }).catch((vError) => {
+                        }).catch((saveError) => {
                             res.json(200, {
                                 success: false,
-                                data: "Sorry validation error occured"
+                                message: "Error saving data",
+                                errorMessage: saveError
+
                             });
                         });
-
-                    } else {
+                    }).catch((vError) => {
                         res.json(200, {
                             success: false,
-                            message: "Sorry no information found with the provided address."
+                            data: "Sorry validation error occured"
                         });
-                    }
+                    });
                 })
                 .catch((error) => {
                     res.json(200, {
                         success: false,
-                        message: "Sorry error occoured.",
-                        errorMessae: error
+                        message: error.errorMessage
                     });
                 });
         } else {
@@ -64,19 +55,11 @@ class CrudController {
                 message: "No address provided."
             });
         }
-        // this.checkingExistingUserByEmail(req.body.email, (result : boolean) => {
-
-        //     if (!result) {
-        //         this.createNewUser(req.body, (result : any) => {
-
-        //             res.json(200, result);
-        //         });
-        //     } else {
-        //         res.json(200, {message: 'an user already exists with this email'});
-        //     }
-        // });
     }
-    saveMarker = (data) => {
+    /**
+     * saving new marker
+     */
+    saveMarker = (data: any) => {
         const markerData = new this.markerModel(data);
         markerData._id = faker.random.uuid();
         return new Promise((resolve, reject) => {
@@ -89,65 +72,66 @@ class CrudController {
             });
         });
     }
+    /**
+     * get longitude and latitude from address
+     */
+    getLatLong(address: string) {
+        return new Promise((resolve, reject) => {
+            axios.get(this.geocodeUrl + address)
+                .then(function (response) {
+                    if (response && response.status === 200 && response.data.results.length) {
+                        resolve(response.data.results[0]);
+                    } else {
+                        reject({
+                            status: false,
+                            errorMessage: "No location found"
+                        });
+                    }
+                })
+                .catch(function (error) {
+                    reject({
+                        status: false,
+                        errorMessage: error.response.data
+                    });
+                });
+        });
+    }
+    /**
+     * updating marker data
+     */
     updateMarker = (req: any, res: any) => {
-        // let password = bcrypt.hashSync(req.body.password, Appconfig.UserSalt);
-
-        // this.markerModel.find({email:req.body.email,password:password},'email -_id',(err,user)=>{
-
-        //     if(err){
-        //         res.json(200,{
-        //             status:false,
-        //             data:err
-        //         });
-        //     }
-        //     else if(user && user.length){
-        //         res.json(200,{
-        //             status:true,
-        //             data:user
-        //         });
-        //     }else{
-        //         res.json(200,{
-        //             status:false,
-        //             data:'no user found with the given information'
-        //         });
-        //     }
-        // });
+        const data = req.body;
+        return this.markerModel.updateOne({ _id: data._id }, data, function (err, response) {
+            if (!err) {
+                res.json(200, {
+                    success: true,
+                    data: "Updated successflly"
+                });
+            }else{
+                res.json(200, {
+                    success: false,
+                    data: err
+                });
+            }
+        });
     }
     /**
-     * checking if user already exists by given email
+     * getting the list of all marker
      */
-    checkingExistingUserByEmail = (email: string, callback) => {
-        this
-            .markerModel
-            .find({
-                email: email
-            }, (err, user) => {
-
-                if (user && user.length) {
-                    return callback(1);
-                } else {
-                    return callback(0);
-                }
-            });
-    }
-    /**
-     * creating new user
-     */
-    deleteMarker = (info: any, callback: any) => {
-
-        // const registermodel = new this.markerModel(info);
-        // registermodel._id = faker
-        //     .random
-        //     .uuid();
-        // registermodel.password = bcrypt.hashSync(info.password, Appconfig.UserSalt);
-        // return registermodel.save((err, user) => {
-
-        //     if (err) {
-        //         return callback({status: 0, ErrorMessage: err});
-        //     } else {
-        //         return callback({status: true, data: user});
-        //     }
-        // });
+    getAllMarker = (req: any, res: any) => {
+        return this.markerModel.find({}, (err, marker) => {
+            if (marker && marker.length && !err) {
+                res.json(200, {
+                    success: true,
+                    data: marker
+                });
+            } else {
+                res.json(200, {
+                    success: false,
+                    message: err
+                });
+            }
+        });
     }
 }
 export default CrudController;
