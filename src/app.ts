@@ -1,5 +1,6 @@
 import * as express from 'express';
 import * as path from 'path';
+import * as cors from 'cors';
 import * as logger from 'morgan';
 import * as cookieParser from 'cookie-parser';
 import CrudRoute from './routes';
@@ -21,6 +22,7 @@ class AppBootStrapper {
         this
             .app
             .use(express.json());
+        this.app.use(cors());
         this
             .app
             .use(express.urlencoded({ extended: false }));
