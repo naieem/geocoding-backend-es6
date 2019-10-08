@@ -16,7 +16,7 @@ class CrudController {
      * handle route controller call and inserts new marker into database
      */
     addNewMarker = (req: any, res: any) => {
-        var address = req.body.address;
+        let address = req.body.address;
         if (address) {
             return this.getLatLong(address)
                 .then((response) => {
@@ -78,6 +78,7 @@ class CrudController {
      * get longitude and latitude from address
      */
     getLatLong(address: string) {
+        address=this.replaceAmpFromAddress(address);
         return new Promise((resolve, reject) => {
             axios.get(this.geocodeUrl + address)
                 .then(function (response) {
@@ -102,7 +103,7 @@ class CrudController {
      * Get Lat long endpoint handler
      */
     getLatLongFromAddress = (req: any, res: any) => {
-        const address = req.body.address;
+        let address = req.body.address;
         if (!address) {
             res.json(200, {
                 status: false,
@@ -118,6 +119,12 @@ class CrudController {
                 res.json(200, error);
             });
         }
+    }
+    replaceAmpFromAddress(address) {
+        address = address.replace(/&/g, '');
+        var tempAdd = address.split(" ");
+        address = tempAdd.join("+");
+        return address;
     }
     /**
      * updating marker data
