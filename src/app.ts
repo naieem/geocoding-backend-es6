@@ -4,6 +4,7 @@ import * as cors from 'cors';
 import * as logger from 'morgan';
 import * as cookieParser from 'cookie-parser';
 import CrudRoute from './routes';
+import AppConfig from "./config";
 import DBconfig from './dbconfig';
 class AppBootStrapper {
     app: any;
@@ -56,8 +57,8 @@ class AppBootStrapper {
     bootstrap = () => {
         this
             .app
-            .listen(5000, function () {
-                console.log('connected to port 3000');
+            .listen(AppConfig.portToConnect, function () {
+                console.log('connected to port '+AppConfig.portToConnect);
             });
     }
     configureDatabase = () => {
