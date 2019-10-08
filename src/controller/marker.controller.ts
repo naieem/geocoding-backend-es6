@@ -24,13 +24,13 @@ class CrudController {
                         debugger;
                         this.saveMarker(vResult).then((saveResult) => {
                             res.json(200, {
-                                success: true,
+                                status: true,
                                 message: "saved successfully",
                                 itemId: saveResult['_id']
                             });
                         }).catch((saveError) => {
                             res.json(200, {
-                                success: false,
+                                status: false,
                                 message: "Error saving data",
                                 errorMessage: saveError
 
@@ -38,21 +38,21 @@ class CrudController {
                         });
                     }).catch((vError) => {
                         res.json(200, {
-                            success: false,
-                            data: "Sorry validation error occured"
+                            status: false,
+                            errorMessage: "Sorry validation error occured"
                         });
                     });
                 })
                 .catch((error) => {
                     res.json(200, {
-                        success: false,
-                        message: error.errorMessage
+                        status: false,
+                        errorMessage: error.errorMessage
                     });
                 });
         } else {
             res.json(200, {
-                success: false,
-                message: "No address provided."
+                status: false,
+                errorMessage: "No address provided."
             });
         }
     }
@@ -103,13 +103,13 @@ class CrudController {
         const address = req.body.address;
         if (!address) {
             res.json(200, {
-                success: false,
-                message: "No address provided"
+                status: false,
+                errorMessage: "No address provided"
             });
         } else {
             this.getLatLong(address).then((result) => {
                 res.json(200, {
-                    success: true,
+                    status: true,
                     data: result
                 });
             }).catch((error) => {
@@ -124,20 +124,20 @@ class CrudController {
         const data = req.body;
         if (!data._id) {
             res.json(200, {
-                success: false,
-                data: "Marker Id required to update."
+                status: false,
+                errorMessage: "Marker Id required to update."
             });
         } else {
             return this.markerModel.updateOne({ _id: data._id }, data, function (err, response) {
                 if (!err) {
                     res.json(200, {
-                        success: true,
+                        status: true,
                         data: "Updated successflly"
                     });
                 } else {
                     res.json(200, {
-                        success: false,
-                        data: err
+                        status: false,
+                        errorMessage: err
                     });
                 }
             });
@@ -150,13 +150,13 @@ class CrudController {
         return this.markerModel.find({}, (err, marker) => {
             if (marker && marker.length && !err) {
                 res.json(200, {
-                    success: true,
+                    status: true,
                     data: marker
                 });
             } else {
                 res.json(200, {
-                    success: false,
-                    message: err
+                    status: false,
+                    errorMessage: err
                 });
             }
         });
