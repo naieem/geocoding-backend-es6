@@ -22,6 +22,9 @@ class CrudRoute {
         this
             .router
             .get('/allMarker', this.markerController.getAllMarker);
+        this
+            .router
+            .get('/getLatLong', this.markerController.getLatLong);
         return this.router;
     }
 }
