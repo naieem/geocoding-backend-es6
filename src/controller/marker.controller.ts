@@ -97,6 +97,27 @@ class CrudController {
         });
     }
     /**
+     * Get Lat long endpoint handler
+     */
+    getLatLongFromAddress = (req: any, res: any) => {
+        const address = req.body.address;
+        if (!address) {
+            res.json(200, {
+                success: false,
+                message: "No address provided"
+            });
+        } else {
+            return this.getLatLong(address).then((result) => {
+                res.json(200, {
+                    success: true,
+                    data: result
+                }); 
+            }).catch((error) => {
+                res.json(200, error);
+            });
+        }
+    }
+    /**
      * updating marker data
      */
     updateMarker = (req: any, res: any) => {
@@ -107,7 +128,7 @@ class CrudController {
                     success: true,
                     data: "Updated successflly"
                 });
-            }else{
+            } else {
                 res.json(200, {
                     success: false,
                     data: err
