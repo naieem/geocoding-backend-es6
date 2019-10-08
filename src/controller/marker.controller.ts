@@ -20,8 +20,7 @@ class CrudController {
         if (address) {
             return this.getLatLong(address)
                 .then((response) => {
-                    new ValidationService(MarkerSchema).validate(response).then((vResult) => {
-
+                    this.validateResponse(response).then((vResult) => {
                         this.saveMarker(vResult).then((saveResult) => {
                             res.json(200, {
                                 status: true,
@@ -55,6 +54,9 @@ class CrudController {
                 errorMessage: "No address provided."
             });
         }
+    }
+    validateResponse(response) {
+        return new ValidationService(MarkerSchema).validate(response);
     }
     /**
      * saving new marker
@@ -119,28 +121,44 @@ class CrudController {
     }
     /**
      * updating marker data
+     * payload:{itemId,address}
      */
     updateMarker = (req: any, res: any) => {
         const data = req.body;
-        if (!data._id) {
+        if (!data.itemId) {
             res.json(200, {
                 status: false,
                 errorMessage: "Marker Id required to update."
             });
         } else {
-            return this.markerModel.updateOne({ _id: data._id }, data, function (err, response) {
-                if (!err) {
-                    res.json(200, {
-                        status: true,
-                        data: "Updated successflly"
+            return this.getLatLong(data.address)
+                .then((response) => {
+                    this.validateResponse(response).then((vResult) => {
+                        this.markerModel.updateOne({ _id: data.itemId }, vResult, function (err) {
+                            if (!err) {
+                                res.json(200, {
+                                    status: true,
+                                    data: "Updated successflly"
+                                });
+                            } else {
+                                res.json(200, {
+                                    status: false,
+                                    errorMessage: err
+                                });
+                            }
+                        });
+                    }).catch((vError) => {
+                        res.json(200, {
+                            status: false,
+                            errorMessage: "Sorry validation error occured"
+                        });
                     });
-                } else {
+                }).catch((error) => {
                     res.json(200, {
                         status: false,
-                        errorMessage: err
+                        errorMessage: error.errorMessage
                     });
-                }
-            });
+                });
         }
     }
     /**
@@ -148,34 +166,34 @@ class CrudController {
      */
     getAllMarker = (req: any, res: any) => {
         return this.markerModel.find({}, (err, marker) => {
-            if (marker && marker.length && !err) {
-                res.json(200, {
-                    status: true,
-                    data: marker
-                });
-            } else {
+            if (err) {
                 res.json(200, {
                     status: false,
                     errorMessage: err
+                });
+            } else {
+                res.json(200, {
+                    status: true,
+                    data: marker
                 });
             }
         });
     }
     deleteMarker = (req: any, res: any) => {
-        if(req.body.itemId){
-            return this.markerModel.deleteOne({ _id: req.body.itemId }, (err)=> {
-                if (err){
+        if (req.body.itemId) {
+            return this.markerModel.deleteOne({ _id: req.body.itemId }, (err) => {
+                if (err) {
                     res.json(200, {
                         status: false,
                         errorMessage: err
                     });
-                }else{
+                } else {
                     res.json(200, {
                         status: true
                     });
                 }
             });
-        }else{
+        } else {
             res.json(200, {
                 status: false,
                 errorMessage: "Sorry No itemId Provided"
