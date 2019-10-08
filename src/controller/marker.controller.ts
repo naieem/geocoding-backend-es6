@@ -111,7 +111,7 @@ class CrudController {
                 res.json(200, {
                     success: true,
                     data: result
-                }); 
+                });
             }).catch((error) => {
                 res.json(200, error);
             });
@@ -122,19 +122,26 @@ class CrudController {
      */
     updateMarker = (req: any, res: any) => {
         const data = req.body;
-        return this.markerModel.updateOne({ _id: data._id }, data, function (err, response) {
-            if (!err) {
-                res.json(200, {
-                    success: true,
-                    data: "Updated successflly"
-                });
-            } else {
-                res.json(200, {
-                    success: false,
-                    data: err
-                });
-            }
-        });
+        if (!data._id) {
+            res.json(200, {
+                success: false,
+                data: "Marker Id required to update."
+            });
+        } else {
+            return this.markerModel.updateOne({ _id: data._id }, data, function (err, response) {
+                if (!err) {
+                    res.json(200, {
+                        success: true,
+                        data: "Updated successflly"
+                    });
+                } else {
+                    res.json(200, {
+                        success: false,
+                        data: err
+                    });
+                }
+            });
+        }
     }
     /**
      * getting the list of all marker
