@@ -3,6 +3,6 @@ build
 dist
 node_modules
 bin
-idea
+.idea/
 package-lock.json
 dist
