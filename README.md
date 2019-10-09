@@ -1,7 +1,7 @@
 # Node Api for Google Map Marker App
 Node api for running CRUD action for Google maps Marker FrontEnd app
 ## Running the Project
-To run the project run,
+Before running the project execute,
 `npm run build` to build the project first and then `npm run serve`
 to run.
 
